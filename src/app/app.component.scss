@@ -1,0 +1,168 @@
+$one:#03045e;
+$two:#0077b6;
+$three:#00b4d8;
+$four:#90e0ef;
+$five:#caf0f8;
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+    background-color: $three;
+    margin-top: -10px;
+}
+
+.logo{
+  display: flex;
+  text-decoration: none;
+  h2{
+    margin: 0 5px;
+    color: $one;
+  }
+  img{
+    width: 50px;
+  }
+}
+  
+.profile-menu {
+    position: relative;
+    width: 300px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+.profile-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    right: 0;
+}
+  
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+  
+.profile-menu:hover .profile-dropdown {
+    display: flex;
+    flex-direction: column;
+    z-index:100;
+    padding: 20px;
+    gap:10px;
+    p{
+      color: $one;
+    }
+    a{
+      text-decoration: none;
+      color: $one;
+    }
+    a:hover{
+      cursor: pointer;
+      transform: scale(1.05);
+    }
+    button{
+      border: none;
+      background-color: $five;
+      padding: 8px 15px;
+      margin-top: 3px;
+      color: $one;
+    }
+    button:hover{
+      cursor: pointer;
+      transform: scale(1.05);
+    }
+}
+
+.signInBtn{
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  color: $one;
+  background-color: $five;
+}
+.signInBtn:hover{
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+footer {
+  background-color: $one;
+  padding: 24px 0;
+  text-align: center;
+  color: $five;
+  font-size: medium;
+  border-top: white 1px solid;
+}
+.footer-sections {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 16px;
+  .footer-detail{
+      min-width: 150px;  
+      h4{
+        text-decoration: underline;
+      } 
+      p{
+        text-align: left;
+      }
+  }
+  h4{
+      font-weight: bold;
+      margin-bottom: 8px;
+  }
+  a{
+      display: block;
+      color: $five;
+      text-decoration: none;
+      margin-bottom: 6px;
+  }
+  a:hover{
+      color: $two;
+
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    justify-content: center;
+    margin-bottom: 15px;
+
+    h2 {
+      font-size: 1.3rem;
+    }
+
+    img {
+      width: 40px;
+    }
+  }
+
+  .profile-menu {
+    width: auto;
+    justify-content: center;
+  }
+
+  .profile-dropdown {
+    top: 40px;
+    right: auto; 
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .signInBtn {
+    padding: 10px;
+    text-align: center;
+  }
+}
+  

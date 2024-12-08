@@ -1,0 +1,28 @@
+<div class="signUpContainer">
+    <div>
+      <img src="sign-up.png" alt="">
+    </div>
+    <div class="form-container">
+      <h2>Sign Up</h2>
+      <p>Already have an account? <a routerLink="/sign-in">Sign In</a></p> 
+      <form (ngSubmit)="onSubmit(signUpForm)" #signUpForm="ngForm">
+        <div class="form-items">
+            <input type="text" placeholder="Username" name="username" required [(ngModel)]="signupData.username"/>
+            <input type="password" placeholder="Password" name="password" required [(ngModel)]="signupData.passwordHash"
+              minlength="6" maxlength="10" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}" #password="ngModel"/>
+            <select name="role" required [(ngModel)]="signupData.role">
+                <option value="Role" disabled="disabled" selected="selected">Role</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Collector">Collector</option>
+                <option value="Resident">Resident</option>
+                <option value="Volunteer">Volunteer</option>
+            </select>
+            <input type="email" placeholder="Email" name="email" required [(ngModel)]="signupData.email"/>
+            <input type="text" placeholder="PhoneNumber" name="phonenumber" required [(ngModel)]="signupData.phoneNumber"/>
+            <input type="text" placeholder="Address" name="address" required [(ngModel)]="signupData.address"/>
+        </div>
+        <button type="submit" [disabled]="!signUpForm.valid">Sign Up</button>
+      </form>
+    </div>  
+  </div>

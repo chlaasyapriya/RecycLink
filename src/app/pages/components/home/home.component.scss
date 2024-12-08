@@ -1,0 +1,122 @@
+$one:#03045e;
+$two:#0077b6;
+$three:#00b4d8;
+$four:#90e0ef;
+$five:#caf0f8;
+// @import 'src/styles.scss';
+
+.section1{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    div{
+        text-align: center;
+    }
+    h1{
+        color: $one;
+        font-size:300%;
+    }
+    h2{
+        color: $two;
+    }
+    .image2{
+        rotate: 180deg;
+    }
+    @media (max-width: 768px){
+        img{
+            display: none;
+        }
+        h1 {
+            font-size: 200%;
+        }
+    }
+}
+
+.collection, .hazardousWaste, .volunteer{
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+    margin-top:100px ;
+    padding: 20px;
+    border: $three 5px solid;
+    border-radius: 10px;
+    img{
+        width: 400px;
+        margin-left: 100px;
+    }
+    div{
+        text-align: center;
+        margin: auto;
+        width: 500px;
+        h1{
+            color: $two;
+        }
+        h2{
+            color: $one;
+        }
+    }
+    @media (max-width: 768px){
+        img{
+            display: none;
+        }
+    }
+}
+.recycle{
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+    margin-top:100px ;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: $four;
+    img{
+        width: 400px;
+        margin-right: 100px;
+    }
+    div{
+        text-align: center;
+        margin: auto;
+        width: 500px;
+        h1{
+            color: $two;
+        }
+        h2{
+            color: $one;
+        }
+    }
+    @media (max-width: 768px){
+        img{
+            display: none;
+        }
+    }
+}
+.training{
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+    margin-top:100px ;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: $three;
+    img{
+        width: 400px;
+        margin-right: 100px;
+    }
+    div{
+        text-align: center;
+        margin: auto;
+        width: 500px;
+        h1{
+            color: $four;
+        }
+        h2{
+            color: $one;
+        }
+    }
+    @media (max-width: 768px){
+        img{
+            display: none;
+        }
+    }
+}

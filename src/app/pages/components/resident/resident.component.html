@@ -1,0 +1,97 @@
+<div class="resident-page">
+    <div class="tabs">
+      <button (click)="toggleSection('complaints')" [class.active]="activeSection === 'complaints'" class="tab">Complaints</button>
+      <button (click)="toggleSection('trainings')" [class.active]="activeSection === 'trainings'" class="tab">Trainings</button>
+      <button (click)="toggleSection('recyclingParticipations')" [class.active]="activeSection === 'recyclingParticipations'" class="tab">Recycling Participations</button>
+      <button (click)="toggleSection('incentives')" [class.active]="activeSection === 'incentives'" class="tab">Incentives</button>
+      <button class="notification-button" (click)="toggleNotifications()">
+        <i class="fa-solid fa-bell"></i>
+      </button>
+    </div>
+  
+    <!-- Notification Dropdown -->
+   <div *ngIf="isNotificationVisible" class="notification-dropdown">
+    <h3>Notifications</h3>
+    <div *ngFor="let notification of notifications">
+      <div class="notification-item">
+        <p>{{ notification.type }}</p>
+        <p>{{notification.message}}</p>
+        <small>{{ notification.timestamp | date }}</small>
+      </div>
+    </div>
+  </div>
+
+    <!-- Complaints Section -->
+    <div *ngIf="activeSection === 'complaints'" class="complaints">
+      <h2>Complaints</h2>
+      <button (click)="showComplaintForm = !showComplaintForm" class="add-button">Add New Complaint <i class="fa-solid fa-plus"></i></button>
+      <div *ngIf="showComplaintForm" class="complaintForm popup-modal">
+        <form (ngSubmit)="submitComplaint()">
+          <input type="text" placeholder="Issue Type" [(ngModel)]="complaintData.issueType" name="issueType" required />
+          <textarea placeholder="Description" [(ngModel)]="complaintData.description" name="description" required></textarea>
+          <div class="editBtns">
+            <button type="submit">Submit</button>
+            <button type="button" (click)="cancelForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+      
+      <div *ngFor="let complaint of complaints" class="complaint-item">
+        <div class="complaint-box">
+          <p><b>Issue:</b> {{ complaint.issueType }}</p>
+          <p><b>Description:</b> {{ complaint.description }}</p>
+          <p><b>Date:</b> {{ complaint.dateReported | date}}</p>
+          <p><b>Status:</b> {{ complaint.resolutionStatus }}</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Trainings Section -->
+    <div *ngIf="activeSection === 'trainings'" class="trainings">
+      <h2>Trainings</h2>
+        <div *ngFor="let training of trainings" class="training-cards">
+          <div class="training-card">
+            <p><b>Title: </b>{{ training.content }}</p>
+          <p><b>Date Scheduled: </b>{{ training.dateScheduled | date}}</p>
+          </div>
+      </div>
+    </div>
+  
+    <!-- Recycling Participation Section -->
+    <div *ngIf="activeSection === 'recyclingParticipations'" class="recycling">
+      <h2>Recycling Participation</h2>
+  
+      <!-- Recycling Participation Form -->
+      <button (click)="showParticipationForm = !showParticipationForm" class="add-button">Add New Recycling Participation <i class="fa-solid fa-plus"></i></button>
+      <div *ngIf="showParticipationForm" class="participationForm popup-modal">
+        <form (ngSubmit)="submitParticipation()">
+          <input type="number" placeholder="Weight (in kg)" [(ngModel)]="participationData.weight" name="weight" required />
+          <input type="text" placeholder="Type" [(ngModel)]="participationData.wasteType" name="type" required />
+          <div class="editBtns">
+            <button type="submit">Submit</button>
+            <button type="button" (click)="cancelForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+  
+      <!-- Previously Added Participations -->
+      <div *ngFor="let participation of recyclingParticipations" class="participation-item">
+        <div class="participation-box">
+          <p><b>Type:</b> {{ participation.wasteType }}</p>
+          <p><b>Weight:</b> {{ participation.weight }} kg</p>
+          <p><b>Date:</b> {{ participation.submissionDate | date }}</p>
+        </div>
+      </div>
+      </div>
+      <!-- Incentives -->
+      <div *ngIf="activeSection === 'incentives'" class="incentives">
+      <h2>Incentives</h2>
+      <div *ngFor="let incentive of incentives" class="incentive-item">
+        <div class="incentive-box">
+          <p><b>Points Earned:</b> {{ incentive.pointsEarned }}</p>
+          <p><b>Reward Type:</b> {{ incentive.rewardType }}</p>
+          <p><b>Redemption Date:</b> {{ incentive.redemptionDate | date}}</p>
+        </div>
+      </div>
+  </div>
+  

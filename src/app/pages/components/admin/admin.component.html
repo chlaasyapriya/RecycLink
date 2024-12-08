@@ -1,0 +1,504 @@
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <nav [class.collapsed]="isSidebarCollapsed" class="sidebar" [ngClass]="{'active': !isSidebarCollapsed}">
+      <button class="toggle" (click)="isSidebarCollapsed = !isSidebarCollapsed">☰</button>
+      <ul>
+        <li *ngFor="let section of sections" 
+            [class.active]="activeSection === section.key"
+            (click)="navigateTo(section.key)">
+          {{ section.label }}
+        </li>
+      </ul>
+    </nav>
+  
+    <!-- Main Content -->
+    <div class="content" [ngClass]="{'hidden': !isSidebarCollapsed}">
+      <ng-container [ngSwitch]="activeSection">
+        <div *ngSwitchCase="'reports'">
+          <h2>Reports</h2>
+          <div class="report-page">
+            <div class="reportBtns">
+              <button (click)="fetchReport()">Generate Weekly Report</button>
+              <button (click)="downloadImage()" *ngIf="report">Download Report as Image</button>
+            </div>
+          
+            <div *ngIf="isLoading">Loading...</div>
+            <div *ngIf="report" id="report-content">
+              <h2>Weekly Report</h2>
+              <div>
+                <h3>Weekly Complaints ({{ report.weeklyComplaints.$values.length }})</h3>
+                <ul> 
+                  <li *ngFor="let complaint of report.weeklyComplaints.$values"> 
+                    {{ complaint.issueType }} - {{complaint.description}} - {{ complaint.dateReported | date }} - {{complaint.resolutionStatus}}
+                </li>
+                </ul>
+              </div>
+              <div>
+                <h3>Collections: {{ report.weeklyCollectionsCount }}</h3>
+              </div>
+              <div>
+                <h3>Events ({{ report.weeklyEvents.$values.length }})</h3>
+                <ul>
+                  <li *ngFor="let event of report.weeklyEvents.$values">{{ event.eventName }} - {{ event.date | date }}</li>
+                </ul>
+              </div>
+              <div>
+                <h3>Trainings ({{ report.weeklyTrainings.$values.length }})</h3>
+                <ul>
+                  <li *ngFor="let training of report.weeklyTrainings.$values">
+                    {{ training.content }} - {{ training.dateScheduled | date }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+  
+        <div *ngSwitchCase="'users'">
+          <h2>Users</h2>
+          <div>
+            <label for="roleFilter" class="roleFilterLabel">Filter by Role:</label>
+            <select class="roleFilter" [(ngModel)]="selectedRole" (change)="filterUsers()">
+              <!-- <option value="Role" disabled="disabled" selected="selected">Select a role</option> -->
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Collector">Collector</option>
+                <option value="Resident">Resident</option>
+                <option value="Volunteer">Volunteer</option>
+                <option value="All" selected>All Users</option>
+            </select>
+          </div>        
+          <!-- Display user list -->
+           <div *ngFor="let user of filteredUsers" class="item">
+                <p><b>UserName: </b>{{user.username}}</p>
+                <p><b>Role: </b>{{user.role}}</p>
+                <p><b>Email: </b>{{user.email}}</p>
+                <p><b>Phone Number: </b>{{user.phoneNumber}}</p>
+           </div>
+        </div>
+  
+        <div *ngSwitchCase="'collections'">
+          <h2>Collections</h2>
+          <button (click)="showForm('add')" class="add-button">Add New Collection  <i class="fa-solid fa-plus"></i></button>
+
+         <!-- Collection Form -->
+          <div *ngIf="isFormVisible" class="form popup-modal">
+             <h3>{{ isEditMode ? 'Edit Collection' : 'Add Collection' }}</h3>
+             <form (ngSubmit)="onSubmit()">
+                <input type="text" placeholder="collectionId" [(ngModel)]="collectionForm.collectionId" name="collectionId" *ngIf="isEditMode" value="{{collectionForm.collectionId}}" disabled/>
+                <input type="text" placeholder="collectionId" [(ngModel)]="collectionForm.collectionId" name="collectionId" *ngIf="!isEditMode"/>
+                <input type="text" placeholder="Location" [(ngModel)]="collectionForm.location"name="location" required />
+                <input type="date" placeholder="Pickup Date" [(ngModel)]="collectionForm.pickupDate" name="pickupDate" required />
+                <input type="number" placeholder="Quantity" [(ngModel)]="collectionForm.quantity" name="quantity"  required />
+                <input type="text" placeholder="Waste Type"  [(ngModel)]="collectionForm.wasteType" name="wasteType" required />
+                <select [(ngModel)]="collectionForm.status" name="status" required>
+                    <option value="" disabled selected>Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <div class="btns">
+                  <button type="submit">{{ isEditMode ? 'Update' : 'Submit' }}</button>
+                  <button type="button" (click)="cancelForm()">Cancel</button>
+                </div>
+             </form>
+          </div>
+
+             <!-- Existing Collections -->
+             <div *ngFor="let collection of collections" class="item">
+                <div class="box">
+                  <p><b>Collection Id:</b> {{ collection.collectionId }}</p>
+                  <p><b>Collector Id:</b> {{ collection.collectorId }}</p>
+                  <p><b>Location: </b>{{ collection.location }}</p>
+                  <p><b>Pick Up Date:</b> {{ collection.pickupDate | date}}</p>
+                  <p><b>Quantity: </b>{{ collection.quantity }}</p>
+                  <p><b>Waste Type:</b> {{ collection.wasteType }}</p>
+                  <p><b>Status:</b> {{ collection.status }}</p>
+                    <div class="editBtns">
+                      <button (click)="showForm('edit', collection)"><i class="fa-solid fa-pen-to-square"></i></button>
+                      <button (click)="deleteCollection(collection.collectionId)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+  
+        <div *ngSwitchCase="'complaints'">
+          <h2>Complaints</h2>
+  
+          <div *ngIf="showComplaintForm" class="popup-modal form">
+            <h3>Edit Complaint Status</h3>
+            <form (ngSubmit)="submitComplaint()">
+              <input type="text" placeholder="ComplaintId" [(ngModel)]="complaintId" name="ComplaintId" value="{{complaintId}}" readonly /> 
+              <input type="text" placeholder="Status" [(ngModel)]="complaintStatus" name="status" required />
+              <div class="btns">
+                <button type="submit">Submit</button>
+                <button type="button" (click)="cancelComplaintForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+      
+          <div *ngFor="let complaint of complaints" class="item">
+            <div class="box">
+              <p><b>Issue:</b> {{ complaint.issueType }}</p>
+              <p><b>Description:</b> {{ complaint.description }}</p>
+              <p><b>Date:</b> {{ complaint.dateReported  | date}}</p>
+              <p><b>Status:</b> {{ complaint.resolutionStatus }}</p>
+              <div class="editBtns">
+                <button (click)="showComplaintform(complaint.complaintId)"><i class="fa-solid fa-pen-to-square"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchCase="'events'">
+          <h2>Events</h2>
+          <button (click)="showAddEventForm()" class="add-button">Add New Event <i class="fa-solid fa-plus"></i></button>
+
+  <!-- Add/Edit Event Form Popup -->
+  <div *ngIf="showEventForm" class="popup-modal form">
+    <h3>{{ isEditingEvent ? 'Edit Event' : 'Add New Event' }}</h3>
+    <form (ngSubmit)="submitEvent()">
+      <input
+        type="text"
+        placeholder="Event Name"
+        [(ngModel)]="currentEvent.eventName"
+        name="name"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Event Location"
+        [(ngModel)]="currentEvent.location"
+        name="location"
+        required
+      />
+      <textarea
+        placeholder="Description"
+        [(ngModel)]="currentEvent.description"
+        name="description"
+        required
+      ></textarea>
+      <input
+        type="date"
+        [(ngModel)]="currentEvent.date"
+        name="date"
+        required
+      />
+      <div class="btns">
+        <button type="submit">{{ isEditingEvent ? 'Update Event' : 'Add Event' }}</button>
+        <button type="button" (click)="cancelEventForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Event List -->
+          <div *ngFor="let event of events" class="item">
+            <div class="box">
+              <p [(ngModel)]="eventId"><b>Event Id: </b>{{event.eventId}}</p>
+              <p ><b>Event Name: </b>{{event.eventName}}</p>
+              <p><b>Event Location: </b>{{event.location}}</p>
+              <p><b>Description: </b> {{ event.description }}</p>
+              <p><b>Date: </b> {{ event.date | date }}</p>
+              <p><b>Status: </b> {{ event.isCompleted ? 'Completed' : 'Pending' }}</p>
+              <div class="editBtns">
+                <button *ngIf="!event.isCompleted" (click)="markAsCompleted(event.eventId)">Mark as Completed <i class="fa-solid fa-check"></i></button>
+                <button (click)="showEditEventForm(event)"><i class="fa-solid fa-pen-to-square"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchCase="'hazardous-waste'">
+          <h2>Hazardous Waste</h2>
+          <button (click)="showAddWasteForm()" class="add-button ">Add Hazardous Waste</button>
+
+          <!-- Add/Edit Hazardous Waste Form Popup -->
+          <div *ngIf="showWasteForm" class="popup-modal form">
+            <h3>{{ isEditingWaste ? 'Edit Hazardous Waste' : 'Add New Hazardous Waste' }}</h3>
+            <form (ngSubmit)="submitWaste()">
+              <input
+                type="text"
+                placeholder="Waste Type"
+                [(ngModel)]="currentWaste.type"
+                name="type"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Location"
+                [(ngModel)]="currentWaste.location"
+                name="location"
+                required
+              />
+              <input
+                type="date"
+                placeholder="Date Collected"
+                [(ngModel)]="currentWaste.dateCollected"
+                name="date"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Disposal Status"
+                [(ngModel)]="currentWaste.disposalStatus"
+                name="disposalStatus"
+                required
+              />
+              <input
+                type="number"
+                placeholder="CollectorId"
+                [(ngModel)]="currentWaste.collectorId"
+                name="collectorId"
+                required
+              />
+              <input
+                type="text"
+                placeholder="PlantId"
+                [(ngModel)]="currentWaste.recyclingPlantId"
+                name="plantId"
+                required
+              />
+              <div class="btns">
+                <button type="submit">{{ isEditingWaste ? 'Update Waste' : 'Add Waste' }}</button>
+                <button type="button" (click)="cancelWasteForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        
+          <!-- Hazardous Waste List -->
+          <div *ngFor="let waste of hazardousWastes" class="item">
+            <div class="box">
+              <p [(ngModel)]="wasteId"><b>Waste Id: </b>{{waste.wasteId}}</p>
+              <p><b>Waste Type: </b>{{ waste.type }}</p>
+              <p><b>Location: </b> {{ waste.location }}</p>
+              <p><b>Date Collected: </b> {{ waste.dateCollected | date}} </p>
+              <p><b>Disposal Status: </b> {{ waste.disposalStatus }} </p>
+              <p><b>Collector Id: </b> {{ waste.collectorId }} </p>
+              <p><b>Recycling Plant Id: </b> {{ waste.recyclingPlantId }} </p>
+              <div class="editBtns">
+                <button (click)="showEditWasteForm(waste)"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button (click)="deleteWaste(waste.wasteId)"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchCase="'recycling-participation'">
+            <h2>Recycling Participation</h2>
+            <div *ngFor="let participation of recyclingParticipations" class="item">
+              <div class="box">
+                <p><b>User Id:</b> {{ participation.userId }}</p>
+                <p><b>Type:</b> {{ participation.wasteType }}</p>
+                <p><b>Weight:</b> {{ participation.weight }} kg</p>
+                <p><b>Date:</b> {{ participation.submissionDate | date}}</p>
+              </div>
+              </div>
+        </div>
+
+        <div *ngSwitchCase="'incentives'">
+          <h2>Incentives</h2>
+          <div *ngFor="let incentive of incentives" class="item">
+            <div class="box">
+              <p><b>User Id:</b> {{incentive.userId}}</p>
+              <p><b>Points Earned:</b> {{ incentive.pointsEarned }}</p>
+              <p><b>Reward Type:</b> {{ incentive.rewardType }}</p>
+              <p><b>Redemption Date:</b> {{ incentive.redemptionDate | date}}</p>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchCase="'recycling-plant'">
+          <h2>Recycling Plants</h2>
+          <button (click)="showAddPlantForm()" class="add-button">Add Recycling Plant <i class="fa-solid fa-plus"></i></button>
+
+  <!-- Add/Edit Recycling Plant Form Popup -->
+  <div *ngIf="showPlantForm" class="popup-modal form">
+    <h3>Add New Recycling Plant </h3>
+    <form (ngSubmit)="submitPlant()">
+      <input
+        type="text"
+        placeholder="Plant Name"
+        [(ngModel)]="currentPlant.name"
+        name="name"
+        required
+      />
+      <input type="text"
+        placeholder="Location"
+        [(ngModel)]="currentPlant.location"
+        name="location"
+        required
+      >
+      <input
+        type="number"
+        placeholder="Capacity (tons/day)"
+        [(ngModel)]="currentPlant.capacity"
+        name="capacity"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Processed Materials"
+        [(ngModel)]="currentPlant.processedMaterials"
+        name="processedMaterials"
+        required
+      />
+      <input
+        type="text"
+        placeholder="ManagerId"
+        [(ngModel)]="currentPlant.managerId"
+        name="managerId"
+        required
+      />
+      <div class="btns">
+        <button type="submit">Add Plant</button>
+        <button type="button" (click)="cancelPlantForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Recycling Plant List -->
+  <div *ngFor="let plant of recyclingPlants" class="item">
+    <div class="box">
+      <p><b>Plant Name: </b>{{ plant.name }}</p>
+      <p><b>Location: </b> {{ plant.location }}</p>
+      <p><b>Capacity: </b> {{ plant.capacity }} tons/day</p>
+      <p><b>Processed Materials: </b> {{ plant.processedMaterials }}</p>
+      <p><b>Manager ID: </b> {{ plant.managerId }}</p>
+      <div class="editBtns">
+        <button (click)="deletePlant(plant.plantId)"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+    
+  </div>
+        </div>
+  
+        <div *ngSwitchCase="'resources'">
+          <h2>Resources</h2>
+          <button (click)="showAddResourceForm()" class="add-button">Add Resource <i class="fa-solid fa-plus"></i></button>
+
+          <!-- Add/Edit Resource Form Popup -->
+          <div *ngIf="showResourceForm" class="popup-modal form">
+            <h3>{{ isEditingResource ? 'Edit Resource' : 'Add New Resource' }}</h3>
+            <form (ngSubmit)="submitResource()">
+              <input
+                type="text"
+                placeholder="Resource Type"
+                [(ngModel)]="currentResource.type"
+                name="type"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Quantity"
+                [(ngModel)]="currentResource.quantity"
+                name="quantity"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Location"
+                [(ngModel)]="currentResource.location"
+                name="location"
+                required
+              />
+              <input
+                type="date"
+                placeholder="Maintenance Date"
+                [(ngModel)]="currentResource.maintenanceDate"
+                name="maintenanceDate"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Status"
+                [(ngModel)]="currentResource.status"
+                name="status"
+                required
+              />
+              <div class="btns">
+                <button type="submit">{{ isEditingResource ? 'Update Resource' : 'Add Resource' }}</button>
+                <button type="button" (click)="cancelResourceForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        
+          <!-- Resource List -->
+          <div *ngFor="let resource of resources" class="item">
+            <div class="box">
+              <p><b>Type: </b>{{ resource.type }}</p>
+              <p><b>Quantity: </b> {{ resource.quantity }}</p>
+              <p><b>Location: </b> {{ resource.location }}</p>
+              <p><b>Maintenance Date: </b> {{ resource.maintenanceDate | date }}</p>
+              <p><b>Status: </b> {{ resource.status }}</p>
+              <div class="editBtns">
+                <button (click)="showEditResourceForm(resource)"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button (click)="deleteResource(resource.resourceId)"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchCase="'trainings'">
+          <h2>Trainings</h2>
+          <button (click)="showAddTrainingForm()" class="add-button">Add Training <i class="fa-solid fa-plus"></i></button>
+
+          <!-- Add/Edit Training Form Popup -->
+          <div *ngIf="showTrainingForm" class="popup-modal form">
+            <h3>{{ isEditingTraining ? 'Edit Training' : 'Add New Training' }}</h3>
+            <form (ngSubmit)="submitTraining()">
+              <input
+                type="text"
+                placeholder="Audience Type"
+                [(ngModel)]="currentTraining.audienceType"
+                name="audienceType"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Content"
+                [(ngModel)]="currentTraining.content"
+                name="content"
+                required
+              />
+              <input
+                type="date"
+                placeholder="Scheduled Date"
+                [(ngModel)]="currentTraining.dateScheduled"
+                name="dateScheduled"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Trainer ID"
+                [(ngModel)]="currentTraining.trainerId"
+                name="trainerId"
+                required
+              />
+              <div class="btns">
+                <button type="submit">{{ isEditingTraining ? 'Update Training' : 'Add Training' }}</button>
+                <button type="button" (click)="cancelTrainingForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        
+          <!-- Training List -->
+          <div *ngFor="let training of trainings" class="item">
+            <div class="box">
+              <p>{{ training.content }}</p>
+              <p><b>Audience Type:</b> {{ training.audienceType }}</p>
+              <p><b>Scheduled Date:</b> {{ training.dateScheduled | date }}</p>
+            </div>
+            <div class="editBtns">
+              <button (click)="showEditTrainingForm(training)"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button (click)="deleteTraining(training.trainingId)"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div *ngSwitchDefault>
+          <h2>Welcome to the Admin Panel</h2>
+        </div>
+      </ng-container>
+    </div>
+</div>
+  

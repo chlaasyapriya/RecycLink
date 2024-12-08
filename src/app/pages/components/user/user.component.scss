@@ -1,0 +1,30 @@
+$one:#03045e;
+$two:#0077b6;
+$three:#00b4d8;
+$four:#90e0ef;
+$five:#caf0f8;
+
+.user-profile-container {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: $five;
+    border: $four 2px solid;
+}
+button{
+  background-color: $five;
+  margin-top: 20px;
+  margin-left: 20px;
+  color: $one;
+  padding: 10px;
+  border: $four 1px solid;
+  border-radius: 50%;
+}  
+button:hover{
+  cursor: pointer;
+  background-color: $four;
+}
+  
+  

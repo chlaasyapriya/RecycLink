@@ -1,0 +1,123 @@
+<div class="collector-page">
+  <!-- Tabs -->
+  <div class="tabs">
+    <button (click)="toggleSection('collections')" [class.active]="activeSection === 'collections'" class="tab">
+      Collections
+    </button>
+    <button (click)="toggleSection('trainings')" [class.active]="activeSection === 'trainings'" class="tab">
+      Trainings
+    </button>
+    <button (click)="toggleSection('hazardousWaste')" [class.active]="activeSection === 'hazardousWaste'" class="tab">
+      Hazardous Waste
+    </button>
+    <button class="notification-button" (click)="toggleNotifications()">
+      <i class="fa-solid fa-bell"></i>
+    </button>
+  </div>  
+
+   <!-- Notification Dropdown -->
+   <div *ngIf="isNotificationVisible" class="notification-dropdown">
+    <h3>Notifications</h3>
+    <div *ngFor="let notification of notifications">
+      <div class="notification-item">
+        <p>{{ notification.type }}</p>
+        <p>{{notification.message}}</p>
+        <small>{{ notification.timestamp | date }}</small>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Collections Section -->
+  <div *ngIf="activeSection === 'collections'" class="collections">
+    <h2>Collections</h2>
+    <button (click)="showForm('add')" class="add-button">Add New Collection  <i class="fa-solid fa-plus"></i></button>
+
+    <!-- Collection Form -->
+    <div *ngIf="isFormVisible" class="collection-form popup-modal">
+      <h3>{{ isEditMode ? 'Edit Collection' : 'Add Collection' }}</h3>
+      <form (ngSubmit)="onSubmit()">
+        <input type="text" placeholder="collectionId" [(ngModel)]="collectionForm.collectionId" name="collectionId" *ngIf="isEditMode" value="{{collectionForm.collectionId}}" disabled/>
+        <input type="text" placeholder="collectionId" [(ngModel)]="collectionForm.collectionId" name="collectionId" *ngIf="!isEditMode" hidden/>
+        <input type="text" placeholder="Location" [(ngModel)]="collectionForm.location"name="location" required />
+        <input type="date" placeholder="Pickup Date" [(ngModel)]="collectionForm.pickupDate" name="pickupDate" required />
+        <input type="number" placeholder="Quantity" [(ngModel)]="collectionForm.quantity" name="quantity"  required />
+        <input type="text" placeholder="Waste Type"  [(ngModel)]="collectionForm.wasteType" name="wasteType" required />
+        <select [(ngModel)]="collectionForm.status" name="status" required>
+          <option value="" disabled selected>Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <div class="collectionBtns">
+          <button type="submit">{{ isEditMode ? 'Update' : 'Submit' }}</button>
+          <button type="button" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Existing Collections -->
+    <div *ngFor="let collection of collections" class="collection-item">
+      <div class="collection-box">
+        <p><b>Collection Id:</b> {{ collection.collectionId }}</p>
+        <p><b>Location: </b>{{ collection.location }}</p>
+        <p><b>Pick Up Date:</b> {{ collection.pickupDate  | date}}</p>
+        <p><b>Quantity: </b>{{ collection.quantity }}</p>
+        <p><b>Waste Type:</b> {{ collection.wasteType }}</p>
+        <p><b>Status:</b> {{ collection.status }}</p>
+        <div class="collectionEditBtns">
+          <button (click)="showForm('edit', collection)"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button (click)="deleteCollection(collection.collectionId)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trainings Section -->
+  <div *ngIf="activeSection === 'trainings'" class="trainings">
+    <h2>Trainings</h2>
+      <div *ngFor="let training of trainings" class="training-cards">
+        <div class="training-card">
+          <p><b>Title: </b>{{ training.content }}</p>
+        <p><b>Date Scheduled: </b>{{ training.dateScheduled | date}}</p>
+        </div>
+    </div>
+  </div>
+
+  <!--Hazardous Wastes-->
+  <div *ngIf="activeSection === 'hazardousWaste'" class="hazardous-waste">
+    <h2>Hazardous Waste</h2>
+    <div *ngIf="showHazardousWasteForm" class="hazardous-waste-form popup-modal">
+      <h3>Edit Hazardous Waste</h3>
+      <form (ngSubmit)="onHazardousWasteSubmit()">
+        <input  type="text" placeholder="Type"  [(ngModel)]="hazardousWasteForm.type" name="type" required />
+        <input type="text" placeholder="Location"[(ngModel)]="hazardousWasteForm.location"  name="location"  required/>
+        <input type="date"  placeholder="Date Collected" [(ngModel)]="hazardousWasteForm.dateCollected" name="dateCollected"required />
+        <input type="text" placeholder="Recycling Plant" [(ngModel)]="hazardousWasteForm.recyclingPlantId"  name="recyclingPlantId" required />
+        <select [(ngModel)]="hazardousWasteForm.disposalStatus" name="disposalStatus" required>
+          <option value="" disabled selected>Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <div class="hwBtns">
+          <button type="submit">Update</button>
+          <button type="button" (click)="cancelHazardousWasteForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div *ngFor="let waste of hazardousWastes" class="hazardous-waste-item">
+      <div class="hazardous-waste-box">
+        <p><b>Waste Type: </b>{{ waste.type }}</p>
+        <p><b>Location: </b>{{ waste.location }}</p>
+        <p><b>Date Collected: </b>{{ waste.dateCollected | date }}</p>
+        <p><b>Disposal Status: </b>{{ waste.disposalStatus }}</p>
+        <p><b>Recycling PlantId: </b>{{ waste.recyclingPlantId }}</p>
+        <div class="hwEditBtn">
+          <button (click)="editHazardousWaste(waste)"><i class="fa-solid fa-pen-to-square"></i></button>
+        </div>
+      </div>
+    </div>
+</div>
+
+  
+

@@ -1,0 +1,77 @@
+$one:#03045e;
+$two:#0077b6;
+$three:#00b4d8;
+$four:#90e0ef;
+$five:#caf0f8;
+
+.signInContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 100px;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        margin: 50px 20px;
+    }
+}
+h2{
+    color: $one;
+}
+.form-container{
+    line-height: 30px;
+    border: 3px solid rgb(158, 158, 158);
+    border-radius: 30px;
+    padding: 50px;
+    a{
+        text-decoration: none;
+        color: $two;
+    }
+}
+input{
+    width: 200px;
+    height: 20px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+input:hover{
+    transform: scale(1.02);
+}
+.form-items{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+button{
+    padding: 8px 12px;
+    margin: 15px 0px auto;
+    cursor: pointer;
+    background-color: $three;
+    border: none;
+    border-radius: 3px;  
+    color: white;
+    &:disabled{
+        background-color: rgb(223, 221, 221);
+        color: rgb(131, 131, 131);
+        cursor: not-allowed;
+    }
+    &:hover{
+        transform: scale(1.05);
+    }
+}
+img{
+    border-radius: 50%;
+    border: 5px $two solid;
+    background-color: white;
+    padding: 10px;
+    @media (max-width: 768px)  {
+        display: none;
+    }
+}
+.error-message{
+    font-size: 15px;
+    color: red;
+    font-weight: 300;
+    margin-top: 0px;
+    display: none;
+}

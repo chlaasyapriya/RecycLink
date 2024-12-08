@@ -1,0 +1,61 @@
+<div class="volunteer-page">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button (click)="toggleSection('events')" [class.active]="activeSection === 'events'" class="tab">Events</button>
+      <button (click)="toggleSection('trainings')" [class.active]="activeSection === 'trainings'" class="tab">Trainings</button>
+      <button (click)="toggleSection('certificates')" [class.active]="activeSection === 'certificates'" class="tab">Certificates</button>
+      <button class="notification-button" (click)="toggleNotifications()"><i class="fa-solid fa-bell"></i>
+      </button>
+    </div>
+  
+    <!-- Events Section -->
+    <div *ngIf="activeSection === 'events'" class="events-section">
+      <h2>Events</h2>
+      <div *ngFor="let event of events" class="event-item">
+        <div class="event-box">
+          <p>{{ event.name }}</p>
+          <p><b>Date: </b>{{ event.date | date }}</p>
+          <p><b>Location: </b>{{ event.location }}</p>
+          <div class="registerBtn">
+            <button  *ngIf="!isRegistered(event.eventId)" (click)="registerForEvent(event.eventId)">Register</button>
+            <button *ngIf="isRegistered(event.eventId)" disabled>Registered</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Trainings Section -->
+    <div *ngIf="activeSection === 'trainings'" class="trainings">
+      <h2>Trainings</h2>
+        <div *ngFor="let training of trainings" class="training-cards">
+          <div class="training-card">
+            <p><b>Title: </b>{{ training.content }}</p>
+          <p><b>Date Scheduled: </b>{{ training.dateScheduled | date }}</p>
+          </div>
+      </div>
+    </div>
+  
+    <!-- Certificates Section -->
+    <div *ngIf="activeSection === 'certificates'" class="certificates-section">
+      <h2>Certificates</h2>
+      <div *ngFor="let certificate of certificatedEvents" class="certificate-item">
+        <div class="certificate-box">
+          <p>Event: {{ certificate.eventName }}</p>
+          <p>Date of Event: {{ certificate.date  | date}}</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Notifications Section -->
+    <div *ngIf="isNotificationVisible" class="notification-dropdown">
+      <h3>Notifications</h3>
+      <div *ngFor="let notification of notifications">
+        <div class="notification-item">
+          <p>{{ notification.type }}</p>
+          <p>{{notification.message}}</p>
+          <small>{{ notification.timestamp | date }}</small>
+        </div>
+      </div>
+    </div>
+</div>
+  
